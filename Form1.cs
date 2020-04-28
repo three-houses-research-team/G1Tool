@@ -225,7 +225,7 @@ namespace G1Tool
                         for (int i = 0; i < BinFileList[treeView1.SelectedNode.Parent.Index][treeView1.SelectedNode.Index].Textures.Count; i++)
                         {
                             LoadImage(BinFileList[treeView1.SelectedNode.Parent.Index][treeView1.SelectedNode.Index].Textures[i]);
-                            pictureBox1.Image.Save(browserDialog.SelectedPath + "\\" + Path.GetFileNameWithoutExtension(treeView1.SelectedNode.Nodes[i].Text) + ".png", ImageFormat.Png);
+                            pictureBox1.Image.Save(browserDialog.SelectedPath + "\\" + Path.GetFileNameWithoutExtension(treeView1.SelectedNode.Nodes[i].Text) + ".png", ImageFormat.Png);   // Probably can just add @ later
                             MessageBox.Show(browserDialog.SelectedPath + "\\" + Path.GetFileNameWithoutExtension(treeView1.SelectedNode.Nodes[i].Text) + ".png");
                         }
                     }
@@ -240,7 +240,7 @@ namespace G1Tool
                     }
                 }
             }
-            
+
         }
 
         private void ReplaceDDS_Click(object sender, EventArgs e)
@@ -636,37 +636,6 @@ namespace G1Tool
             return null;
         }
 
-        private void Button1_Click(object sender, EventArgs e)
-        {
-            using (var savedialog = new SaveFileDialog())
-            {
-                savedialog.DefaultExt = ".png";
-                if (savedialog.ShowDialog() == DialogResult.OK)
-                {
-                    pictureBox1.Image.Save(savedialog.FileName, ImageFormat.Png);
-                }
-            }
-        }
-
-        private void TextureListBox_MouseDown(object sender, MouseEventArgs e)
-        {
-            /*
-            if (e.Button == MouseButtons.Right)
-            {
-                int indexitem = textureListBox.IndexFromPoint(e.X, e.Y);
-                if (indexitem == -1)
-                {
-                    g1tMenu.Show(this, new System.Drawing.Point(e.X, e.Y));
-                }
-                else if (textureListBox.Items[indexitem] is G1Texture)
-                {
-                    textureListBox.SelectedIndex = indexitem;
-                    textureMenu.Show(this, new System.Drawing.Point(e.X, e.Y));
-                }
-            }
-            */
-        }
-
         private void Save_Click(object sender, EventArgs e)
         {
             if (FormatIndex == NodeIndexBin && treeView1.Nodes.ContainsKey("BIN"))
@@ -728,29 +697,89 @@ namespace G1Tool
         }
         private void NumericUpDownMipMap_ValueChanged(object sender, EventArgs e)
         {
-            /*
-            G1Texture tex = currentG1T.Textures[textureListBox.SelectedIndex];
+            G1Texture tex = new G1Texture();
+            if (FormatIndex == NodeIndexBin && treeView1.Nodes.ContainsKey("BIN"))
+            {
+                if (treeView1.SelectedNode.Level == 2)
+                {
+                    tex = BinFileList[treeView1.SelectedNode.Parent.Index][treeView1.SelectedNode.Index].Textures[treeView1.SelectedNode.FirstNode.Index];
+                }
+                if (treeView1.SelectedNode.Level == 3)
+                {
+                    tex = BinFileList[treeView1.SelectedNode.Parent.Parent.Index][treeView1.SelectedNode.Parent.Index].Textures[treeView1.SelectedNode.Index];
+                }
+            }
+            if (FormatIndex == NodeIndexG1T && treeView1.Nodes.ContainsKey("G1T"))
+            {
+                if (treeView1.SelectedNode.Level == 1)
+                {
+                    tex = G1TFileList[treeView1.SelectedNode.Index].Textures[treeView1.SelectedNode.FirstNode.Index];
+                }
+                if (treeView1.SelectedNode.Level == 2)
+                {
+                    tex = G1TFileList[treeView1.SelectedNode.Parent.Index].Textures[treeView1.SelectedNode.Index];
+                }
+            }
             tex.MipMapCount = (byte)numericUpDownMipMap.Value;
-            */
         }
 
         private void CheckBoxNormalMap_CheckedChanged(object sender, EventArgs e)
         {
-            /*
-            G1Texture tex = currentG1T.Textures[textureListBox.SelectedIndex];
+            G1Texture tex = new G1Texture();
+            if (FormatIndex == NodeIndexBin && treeView1.Nodes.ContainsKey("BIN"))
+            {
+                if (treeView1.SelectedNode.Level == 2)
+                {
+                    tex = BinFileList[treeView1.SelectedNode.Parent.Index][treeView1.SelectedNode.Index].Textures[treeView1.SelectedNode.FirstNode.Index];
+                }
+                if (treeView1.SelectedNode.Level == 3)
+                {
+                    tex = BinFileList[treeView1.SelectedNode.Parent.Parent.Index][treeView1.SelectedNode.Parent.Index].Textures[treeView1.SelectedNode.Index];
+                }
+            }
+            if (FormatIndex == NodeIndexG1T && treeView1.Nodes.ContainsKey("G1T"))
+            {
+                if (treeView1.SelectedNode.Level == 1)
+                {
+                    tex = G1TFileList[treeView1.SelectedNode.Index].Textures[treeView1.SelectedNode.FirstNode.Index];
+                }
+                if (treeView1.SelectedNode.Level == 2)
+                {
+                    tex = G1TFileList[treeView1.SelectedNode.Parent.Index].Textures[treeView1.SelectedNode.Index];
+                }
+            }
             if (checkBoxNormalMap.Checked)
                 tex.NormalMapFlags = 3;
             else
                 tex.NormalMapFlags = 0;
-                */
         }
 
         private void ComboBoxCompression_SelectedIndexChanged(object sender, EventArgs e)
         {
-            /*
-                G1Texture tex = currentG1T.Textures[textureListBox.SelectedIndex];
-                tex.pixelInternalFormat = G1Texture.GetPixelInternalFormatForTextures((byte)((ComboBoxItem)comboBoxCompression.SelectedItem).Value);
-            */
+            G1Texture tex = new G1Texture();
+            if (FormatIndex == NodeIndexBin && treeView1.Nodes.ContainsKey("BIN"))
+            {
+                if (treeView1.SelectedNode.Level == 2)
+                {
+                    tex = BinFileList[treeView1.SelectedNode.Parent.Index][treeView1.SelectedNode.Index].Textures[treeView1.SelectedNode.FirstNode.Index];
+                }
+                if (treeView1.SelectedNode.Level == 3)
+                {
+                    tex = BinFileList[treeView1.SelectedNode.Parent.Parent.Index][treeView1.SelectedNode.Parent.Index].Textures[treeView1.SelectedNode.Index];
+                }
+            }
+            if (FormatIndex == NodeIndexG1T && treeView1.Nodes.ContainsKey("G1T"))
+            {
+                if (treeView1.SelectedNode.Level == 1)
+                {
+                    tex = G1TFileList[treeView1.SelectedNode.Index].Textures[treeView1.SelectedNode.FirstNode.Index];
+                }
+                if (treeView1.SelectedNode.Level == 2)
+                {
+                    tex = G1TFileList[treeView1.SelectedNode.Parent.Index].Textures[treeView1.SelectedNode.Index];
+                }
+            }
+            tex.pixelInternalFormat = G1Texture.GetPixelInternalFormatForTextures((byte)((ComboBoxItem)comboBoxCompression.SelectedItem).Value);
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
