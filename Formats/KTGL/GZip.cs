@@ -4,10 +4,11 @@ using System.IO.Compression;
 using G1Tool.IO;
 using System;
 using System.Linq;
+using Ionic.Zlib;
 
 namespace G1Tool.Formats
 {
-    class KTGZip
+    class GZip
     {
         public static byte[] Decompress(byte[] file)
         {
@@ -33,7 +34,7 @@ namespace G1Tool.Formats
                                 w.Write(splits[i]);
                             else
                             {
-                                using (GZipStream deflate = new GZipStream(new MemoryStream(r.ReadBytes((int)cur_comp)), CompressionMode.Decompress))
+                                using (System.IO.Compression.GZipStream deflate = new System.IO.Compression.GZipStream(new MemoryStream(r.ReadBytes((int)cur_comp)), System.IO.Compression.CompressionMode.Decompress))
                                     deflate.CopyTo(w.BaseStream);
                             }
                         }
@@ -41,7 +42,7 @@ namespace G1Tool.Formats
                         {
                             if (cur_comp == splits[i] - 4)
                             {
-                                using (GZipStream deflate = new GZipStream(new MemoryStream(r.ReadBytes((int)cur_comp)), CompressionMode.Decompress))
+                                using (System.IO.Compression.GZipStream deflate = new System.IO.Compression.GZipStream(new MemoryStream(r.ReadBytes((int)cur_comp)), System.IO.Compression.CompressionMode.Decompress))
                                     deflate.CopyTo(w.BaseStream);
                             }
                         }
@@ -62,8 +63,11 @@ namespace G1Tool.Formats
             {
                 for (int i = 0; i < partitionCount; i++)
                 {
-                        byte[] partition = ZLib.Compress(reader.ReadBytes(splitSize));
-                        partitionList.Add(partition);
+                    var encoding = new ZlibCodec();
+                    encoding.InitializeDeflate(Ionic.Zlib.CompressionLevel.BestCompression);    // RFC1950/1951/1952 encoding needed
+                    byte[] buffer = ZlibStream.CompressBuffer(reader.ReadBytes(splitSize));
+                    encoding.EndDeflate();
+                    partitionList.Add(buffer);
                 }
 
             }
@@ -87,30 +91,8 @@ namespace G1Tool.Formats
                     br.BaseStream.Write(partitionList[i], 0x0, partitionList[i].Length);
                     currentOffset = br.BaseStream.Position;
                 }
-                ms.Capacity = (int)br.BaseStream.Position;   // MS doubles capacity every time buffer is exceeded
-                return ms.GetBuffer();
+                return ms.ToArray();
             }
         }
     }
-    // Credits: https://github.com/KillzXGaming/Switch-Toolbox
-    public class ZLib
-    {
-        public static byte[] Compress(byte[] b, uint Position = 0)
-        {
-            var output = new MemoryStream();
-            output.Write(new byte[] { 0x78, 0xDA }, 0, 2);
-
-            using (var zipStream = new DeflateStream(output, CompressionMode.Compress, true))
-                zipStream.Write(b, 0, b.Length);
-
-            //Add this as it weirdly prevents the data getting corrupted
-            //From https://github.com/IcySon55/Kuriimu/blob/f670c2719affc1eaef8b4c40e40985881247acc7/src/Kontract/Compression/ZLib.cs
-            var adler = b.Aggregate(Tuple.Create(1, 0), (x, n) => Tuple.Create((x.Item1 + n) % 65521, (x.Item1 + x.Item2 + n) % 65521));
-            output.Write(new[] { (byte)(adler.Item2 >> 8), (byte)adler.Item2, (byte)(adler.Item1 >> 8), (byte)adler.Item1 }, 0, 4);
-            return output.ToArray();
-        }
-
-
-    }
-
 }
