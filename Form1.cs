@@ -13,7 +13,7 @@ namespace G1Tool
     public partial class Form1 : Form
     {
         ContextMenu g1tMenu = new ContextMenu();
-        private KTBin BinFile { get; set; }
+        private Bin BinFile { get; set; }
         private int FormatIndex { get; set; }
         private ContextMenu ContextMenuBinDDS { get; set; }
         private ContextMenu ContextMenuBinG1T { get; set; }
@@ -454,7 +454,7 @@ namespace G1Tool
                 };
 
                 treeView1.Nodes[NodeIndexBin].Nodes.Add(node);
-                BinFile = new KTBin();
+                BinFile = new Bin();
                 var binEntries = new List<G1T>();
                 var dummyEntry = new G1T();
 
@@ -466,7 +466,7 @@ namespace G1Tool
                         #region Compressed Entries
                         try
                         {
-                            int magicID = BitConverter.ToInt32(KTGZip.Decompress(BinFile.FileList[ii]), 0x0);
+                            int magicID = BitConverter.ToInt32(GZip.Decompress(BinFile.FileList[ii]), 0x0);
                             switch (magicID)
                             {
                                 case (0x47314D5F):  // G1M_
@@ -480,7 +480,7 @@ namespace G1Tool
                                         treeView1.Nodes[NodeIndexBin].Nodes[i].Nodes.Add(new TreeNode(ii.ToString() + ".g1t"));
 
                                         var g1t = new G1T();
-                                        g1t.Read(KTGZip.Decompress(BinFile.FileList[ii]));
+                                        g1t.Read(GZip.Decompress(BinFile.FileList[ii]));
                                         for (int iii = 0; iii < g1t.Textures.Count; iii++)
                                         {
                                             treeView1.Nodes[NodeIndexBin].Nodes[i].Nodes[ii].Nodes.Add(iii.ToString() + ".dds");
@@ -674,7 +674,7 @@ namespace G1Tool
                 var fileList = new List<byte[]>();
                 for (int i = 0; i < BinFileList[treeView1.SelectedNode.Index].Count; i++)    // For Each G1T file of the selected bin file
                 {
-                    fileList.Add(KTGZip.Compress(BinFileList[treeView1.SelectedNode.Index][i].Write()));
+                    fileList.Add(GZip.Compress(BinFileList[treeView1.SelectedNode.Index][i].Write()));
                 }
                 BinFile.Write(fileList, FilePathBinGZList[treeView1.SelectedNode.Index]);
             }
@@ -702,7 +702,7 @@ namespace G1Tool
                         var fileList = new List<byte[]>();
                         for (int i = 0; i < BinFileList[treeView1.SelectedNode.Index].Count; i++)    // For Each G1T file of the selected bin file
                         {
-                            fileList.Add(KTGZip.Compress(BinFileList[treeView1.SelectedNode.Index][i].Write()));
+                            fileList.Add(GZip.Compress(BinFileList[treeView1.SelectedNode.Index][i].Write()));
                         }
                         BinFile.Write(fileList, savedialog.FileName);
                     }

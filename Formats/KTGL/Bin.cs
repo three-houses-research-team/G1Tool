@@ -3,7 +3,7 @@ using System.IO;
 
 namespace G1Tool.Formats
 {
-    public class KTBin
+    public class Bin
     {
         public List<byte[]> FileList { get; set; }
         public void Read(string path)
